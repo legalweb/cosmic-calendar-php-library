@@ -1,0 +1,44 @@
+{
+    "name": "legalweb/cosmic-calendar-php-library",
+    "description": "PHP Cosmic Calendar API Client",
+    "type": "library",
+    "license": "",
+    "homepage": "https://github.com/legalweb/cosmic-calendar-php-library/",
+    "authors": [
+        {
+            "name": "Aaron Parker",
+            "email": "aaron@legalweb.org.uk",
+            "homepage": "http://www.legalweb.org.uk"
+        }
+    ],
+    "keywords": [
+        "legalweb",
+        "Cosmic",
+        "Calendar",
+        "API"
+    ],
+    "require": {
+        "php": ">=7.1",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.8",
+        "friendsofphp/php-cs-fixer": "1.7.*",
+        "ulrichsg/getopt-php": "^3.2",
+        "yosymfony/toml": "^1.0"
+    },
+    "suggest": {
+        
+    },
+    "autoload": {
+        "psr-4": {
+            "Legalweb\\CosmicCalendarClient\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Legalweb\\CosmicCalendarClientTest\\": "tests/",
+            "Legalweb\\CosmicCalendarClientExample\\": "examples/"
+        }
+    }
+}
