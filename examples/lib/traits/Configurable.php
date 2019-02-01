@@ -6,7 +6,7 @@ use GetOpt\GetOpt;
 use Yosymfony\Toml\Toml;
 use Legalweb\CosmicCalendarClient\Config;
 
-trait UsesConfig {
+trait Configurable {
 
     /**
      * @param GetOpt $opt

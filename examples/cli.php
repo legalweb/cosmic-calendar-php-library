@@ -10,7 +10,12 @@ namespace {
     use GetOpt\Command;
     use GetOpt\ArgumentException;
     use GetOpt\ArgumentException\Missing;
+    use Legalweb\CosmicCalendarClientExample\Lib\Commands\AddEvent;
+    use Legalweb\CosmicCalendarClientExample\Lib\Commands\AddTask;
     use Legalweb\CosmicCalendarClientExample\Lib\Commands\GetClientToken;
+    use Legalweb\CosmicCalendarClientExample\Lib\Commands\GetEvents;
+    use Legalweb\CosmicCalendarClientExample\Lib\Commands\GetTasks;
+    use Legalweb\CosmicCalendarClientExample\Lib\Commands\GetOAuthURLs;
 
     define('NAME', 'run');
     define('VERSION', '1.0-alpha');
@@ -29,7 +34,12 @@ namespace {
         echo "When you see this message the setup works." . PHP_EOL;
     })->setDescription("Check if setup works"));
 
+    $opt->addCommand(new AddEvent());
+    $opt->addCommand(new AddTask());
     $opt->addCommand(new GetClientToken());
+    $opt->addCommand(new GetEvents());
+    $opt->addCommand(new GetTasks());
+    $opt->addCommand(new GetOAuthURLs());
 
     try {
         try {

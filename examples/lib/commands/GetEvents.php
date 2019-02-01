@@ -4,18 +4,23 @@ namespace Legalweb\CosmicCalendarClientExample\Lib\Commands;
 
 use GetOpt\Command;
 use GetOpt\GetOpt;
+use GetOpt\Option;
 use Legalweb\CosmicCalendarClient\CalendarService;
 use Legalweb\CosmicCalendarClient\Traits\Castable;
 use Legalweb\CosmicCalendarClientExample\Lib\Traits\Configurable;
 
-class GetClientToken extends Command {
+class GetEvents extends Command {
 
     use Castable;
     use Configurable;
 
     public function __construct()
     {
-        parent::__construct('getclienttoken', [$this, 'handle']);
+        $options = [
+            Option::create("u", "user", Getopt::REQUIRED_ARGUMENT)->setDescription("Specify user to act on behalf of"),
+            Option::create("d", "days", Getopt::OPTIONAL_ARGUMENT)->setDescription("Specify number of days ahead to obtain events for"),
+        ];
+        parent::__construct('getevents', [$this, 'handle'], $options);
     }
 
     /**
@@ -31,13 +36,18 @@ class GetClientToken extends Command {
         }
 
         try {
-            $cs = CalendarService::NewCalendarService($c);
-            $r = $cs->GetClientToken();
+            $cs = CalendarService::NewCalendarService($c, false, $opt->getOption("user"));
+
+            if ($days = $opt->getOption("days")) {
+                $r = $cs->GetEvents($opt->getOption("days"));
+            } else {
+                $r = $cs->GetEvents();
+            }
 
             if ($r) {
-                echo "\nToken: ", $r->Token, "\nVendor: ", $r->Vendor, "\nExpires: ", $r->Expires, "\n";
+                var_dump($r);
             } else {
-                echo "\nNo token retrieved.\n";
+                echo "\nNo events retrieved.\n";
             }
         } catch (\Exception $exception) {
             trigger_error("Unexpected error occurred: " . $exception->getMessage());
