@@ -2,7 +2,7 @@
     "name": "cosmic-calendar/api",
     "description": "PHP Cosmic Calendar API Client",
     "type": "library",
-    "license": "",
+    "license": "GPL-3.0-only",
     "homepage": "https://github.com/legalweb/cosmic-calendar-php-library/",
     "authors": [
         {
