@@ -35,14 +35,13 @@ class EventRequest implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $aDay = new \DateInterval("P1D");
         return [
             'summary' => $this->summary,
             'start' => $this->start->format("Y-m-d\TH:i:s\Z"),
             'end' => $this->end ?
                 $this->end->format("Y-m-d\TH:i:s\Z") :
-                new \DateTime($this->start->format("Y-m-d\TH:i:s\Z"))
-                    ->add($aDay),
+                (new \DateTime($this->start->format("Y-m-d\TH:i:s\Z")))
+                    ->add(new \DateInterval("P1D"))->format("Y-m-d\TH:i:s\Z"),
         ];
     }
 }

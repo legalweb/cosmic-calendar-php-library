@@ -44,10 +44,6 @@ class AddEvent extends Command {
             $start = new \DateTime($opt->getOption("start"));
             $end = null;
 
-            var_dump($summary);
-            var_dump($start);
-            var_dump($end);
-
             if ($end = $opt->getOption("end")) {
                 $end = new \DateTime($opt->getOption("end"));
             }

@@ -10,3 +10,4 @@ nbproject
 .settings
 vendor
 composer.lock
+examples/config.toml
