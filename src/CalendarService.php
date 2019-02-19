@@ -2,6 +2,21 @@
 
 namespace Legalweb\CosmicCalendarClient;
 
+use Legalweb\CosmicCalendarClient\Exceptions\AccessForbiddenException;
+use Legalweb\CosmicCalendarClient\Exceptions\APIRequestException;
+use Legalweb\CosmicCalendarClient\Exceptions\APIUnavailableException;
+use Legalweb\CosmicCalendarClient\Exceptions\ClientTokenDecodingException;
+use Legalweb\CosmicCalendarClient\Exceptions\EventItemsNotFoundException;
+use Legalweb\CosmicCalendarClient\Exceptions\EventNotCreatedException;
+use Legalweb\CosmicCalendarClient\Exceptions\EventsNotFoundException;
+use Legalweb\CosmicCalendarClient\Exceptions\InvalidJSONResponseException;
+use Legalweb\CosmicCalendarClient\Exceptions\NotConfiguredException;
+use Legalweb\CosmicCalendarClient\Exceptions\TaskItemsNotFoundException;
+use Legalweb\CosmicCalendarClient\Exceptions\TaskNotCreatedException;
+use Legalweb\CosmicCalendarClient\Exceptions\TasksNotFoundException;
+use Legalweb\CosmicCalendarClient\Exceptions\TokenNotFoundException;
+use Legalweb\CosmicCalendarClient\Exceptions\URLsNotFoundException;
+use Legalweb\CosmicCalendarClient\Exceptions\UserNotConfiguredException;
 use Legalweb\CosmicCalendarClient\Models\EventRequest;
 use Legalweb\CosmicCalendarClient\Models\TaskRequest;
 
@@ -58,6 +73,7 @@ class CalendarService
      * @param string $name
      *
      * @return CalendarService|null
+     * @throws NotConfiguredException
      */
     public static function GetInstance(string $name = '')
     {
@@ -65,8 +81,7 @@ class CalendarService
             if (isset(self::$instances[$name])) {
                 return self::$instances[$name];
             } else {
-                trigger_error("Calendar Service " . $name . " not configured");
-                return null;
+                throw new NotConfiguredException("Calendar Service " . $name . " not configured");
             }
         }
 
@@ -74,7 +89,7 @@ class CalendarService
             return self::$defaultInstance;
         }
 
-        trigger_error("Calendar Service not configured");
+        throw new NotConfiguredException("Calendar Service not configured");
 
         return null;
     }
@@ -97,6 +112,7 @@ class CalendarService
 
     /**
      * @return ClientToken|null
+     * @throws TokenNotFoundException
      */
     public function GetClientToken() {
         $r = $this->curlRequest("/token/");
@@ -106,8 +122,7 @@ class CalendarService
         }
 
         if (!isset($r->Token)) {
-            trigger_error("Token not found in JSON response");
-            return null;
+            throw new TokenNotFoundException("Token not found in JSON response");
         }
 
         return ClientToken::FromStdClass($r->Token);
@@ -119,7 +134,7 @@ class CalendarService
      * @param \DateTime|null $end
      *
      * @return |null
-     * @throws \Exception
+     * @throws EventNotCreatedException
      */
     public function AddEvent(string $summary, \DateTime $start, \DateTime $end = null) {
         $this->mustHaveUser();
@@ -137,8 +152,7 @@ class CalendarService
         }
 
         if (!isset($r->Event)) {
-            trigger_error("Event not created");
-            return null;
+            throw new EventNotCreatedException("Event not created");
         }
 
         return $r->Event;
@@ -149,7 +163,7 @@ class CalendarService
      * @param \DateTime $due
      *
      * @return |null
-     * @throws \Exception
+     * @throws TaskNotCreatedException
      */
     public function AddTask(string $title, \DateTime $due) {
         $this->mustHaveUser();
@@ -167,8 +181,7 @@ class CalendarService
         }
 
         if (!isset($r->Task)) {
-            trigger_error("Task not created");
-            return null;
+            throw new TaskNotCreatedException("Task not created");
         }
 
         return $r->Task;
@@ -178,7 +191,9 @@ class CalendarService
      * @param int $days
      *
      * @return |null
-     * @throws \Exception
+     * @throws EventItemsNotFoundException
+     * @throws EventsNotFoundException
+     * @throws UserNotConfiguredException
      */
     public function GetEvents(int $days = 0) {
         $this->mustHaveUser();
@@ -196,13 +211,11 @@ class CalendarService
         }
 
         if (!isset($r->Events)) {
-            trigger_error("Events not found in JSON response");
-            return null;
+            throw new EventsNotFoundException("Events not found in JSON response");
         }
 
         if (!isset($r->Events->items)) {
-            trigger_error("Events items not found in JSON response");
-            return null;
+            throw new EventItemsNotFoundException("Events items not found in JSON response");
         }
 
         return $r->Events->items;
@@ -210,7 +223,9 @@ class CalendarService
 
     /**
      * @return |null
-     * @throws \Exception
+     * @throws TaskItemsNotFoundException
+     * @throws TasksNotFoundException
+     * @throws UserNotConfiguredException
      */
     public function GetTasks() {
         $this->mustHaveUser();
@@ -222,13 +237,11 @@ class CalendarService
         }
 
         if (!isset($r->Tasks)) {
-            trigger_error("Tasks not found in JSON response");
-            return null;
+            throw new TasksNotFoundException("Tasks not found in JSON response");
         }
 
         if (!isset($r->Tasks->items)) {
-            trigger_error("Tasks items not found in JSON response");
-            return null;
+            throw new TaskItemsNotFoundException("Tasks items not found in JSON response");
         }
 
         return $r->Tasks->items;
@@ -236,6 +249,7 @@ class CalendarService
 
     /**
      * @return |null
+     * @throws URLsNotFoundException
      */
     public function GetOAuthURLs() {
         $r = $this->curlRequest("/login/oauth/urls");
@@ -245,8 +259,7 @@ class CalendarService
         }
 
         if (!isset($r->URLS)) {
-            trigger_error("URLs not found in JSON response");
-            return null;
+            throw new URLsNotFoundException("URLs not found in JSON response");
         }
 
         return $r->URLS;
@@ -254,7 +267,7 @@ class CalendarService
 
     /**
      * @return bool
-     * @throws \Exception
+     * @throws UserNotConfiguredException
      */
     protected function mustHaveUser()
     {
@@ -262,13 +275,16 @@ class CalendarService
             return true;
         }
 
-        throw new \Exception("User not configured for request");
+        throw new UserNotConfiguredException("User not configured for request");
     }
 
     /**
      * @param string $r
      *
      * @return object|null
+     * @throws APIRequestException
+     * @throws ClientTokenDecodingException
+     * @throws InvalidJSONResponseException
      */
     protected function decodeResponse(string $r) {
         if ($r === null) {
@@ -278,18 +294,15 @@ class CalendarService
         $o = json_decode($r);
 
         if ($o === null) {
-            trigger_error("Error decoding JSON response for client token");
-            return null;
+            throw new ClientTokenDecodingException("Error decoding JSON response for client token");
         }
 
         if (!isset($o->ResponseCode) || !isset($o->Response)) {
-            trigger_error("Invalid JSON response");
-            return null;
+            throw new InvalidJSONResponseException("Invalid JSON response");
         }
 
         if ($o->ResponseCode !== 200) {
-            trigger_error("API request failed");
-            return $o->Response;
+            throw new APIRequestException("API request failed", $o->ResponseCode);
         }
 
         return (object) $o->Response;
@@ -297,9 +310,14 @@ class CalendarService
 
     /**
      * @param string $url
-     * @param string $data
+     * @param string $json
      *
      * @return object|null
+     * @throws APIRequestException
+     * @throws APIUnavailableException
+     * @throws AccessForbiddenException
+     * @throws ClientTokenDecodingException
+     * @throws InvalidJSONResponseException
      */
     protected function curlRequest(string $url, string $json = "") {
         $ch = curl_init($this->config->EndPoint . $url);
@@ -331,29 +349,23 @@ class CalendarService
 
         if (is_bool($r)) {
             if ($r === false) {
-                trigger_error("Error making API request");
-                return null;
+                throw new APIRequestException("Error making API request");
             } else {
-                trigger_error("No response data for API request");
-                return null;
+                throw new APIRequestException("No response data for API request");
             }
         }
 
         switch ($httpcode) {
             case 503:
-                trigger_error("API Service Unavailable");
-                return null;
+                throw new APIUnavailableException("API Service Unavailable");
             case 403:
-                trigger_error("Access Forbidden");
-                return null;
+                throw new AccessForbiddenException("Access Forbidden");
             case 400:
-                trigger_error("Bad API request");
-                return null;
+                throw new APIRequestException("Bad API request");
             case 200:
                 return $this->decodeResponse((string) $r);
             default:
-                trigger_error("Unhandled API response: " . $httpcode);
-                return null;
+                throw new APIRequestException("Unhandled API response", $httpcode);
         }
     }
 }
