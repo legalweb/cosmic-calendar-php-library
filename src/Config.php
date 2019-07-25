@@ -8,4 +8,5 @@ class Config
     var $Client;
     var $Secret;
     var $EndPoint;
+    var $VerifySSL;
 }

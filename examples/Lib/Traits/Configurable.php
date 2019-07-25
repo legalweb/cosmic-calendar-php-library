@@ -16,12 +16,13 @@ trait Configurable {
     protected function getCalendarConfig(GetOpt $opt) {
         $c = new Config();
 
-        list($client, $secret, $endpoint) = $this->getConfigOptions($opt);
+        list($client, $secret, $endpoint, $verifyssl) = $this->getConfigOptions($opt);
 
         $c->Name = "Example";
         $c->Client = $client;
         $c->Secret = $secret;
         $c->EndPoint = $endpoint;
+        $c->VerifySSL = $verifyssl;
 
         return $c;
     }
@@ -37,11 +38,13 @@ trait Configurable {
         $client = "";
         $secret = "";
         $endpoint = "";
+        $verifyssl = false;
 
         if (is_null($config)) {
             $client = $opt->getOption('client');
             $secret = $opt->getOption('secret');
             $endpoint = $opt->getOption('endpoint');
+            $verifyssl = $opt->getOption('verifyssl');
 
             if (!$client || !$secret || !$endpoint) {
                 throw new \InvalidArgumentException("client, secret & endpoint must be set if not providing config file");
@@ -56,9 +59,10 @@ trait Configurable {
             $client = $c['CLIENT'];
             $secret = $c['SECRET'];
             $endpoint = $c['ENDPOINT'];
+            $verifyssl = $c['VERIFYSSL'];
         }
 
-        return [ $client, $secret, $endpoint ];
+        return [ $client, $secret, $endpoint, $verifyssl ];
     }
 
 }

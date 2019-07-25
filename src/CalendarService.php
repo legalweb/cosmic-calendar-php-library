@@ -342,6 +342,14 @@ class CalendarService
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
 
+        if (!$this->config->VerifySSL) {
+            curl_setopt($ch,CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch,CURLOPT_SSL_VERIFYSTATUS, false);
+        }
+
+        curl_setopt($ch, CURLOPT_VERBOSE, true);
+
         $r = curl_exec($ch);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
