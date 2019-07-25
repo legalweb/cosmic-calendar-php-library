@@ -41,7 +41,7 @@ class EventRequest implements \JsonSerializable
             'end' => $this->end ?
                 $this->end->format("Y-m-d\TH:i:s\Z") :
                 (new \DateTime($this->start->format("Y-m-d\TH:i:s\Z")))
-                    ->add(new \DateInterval("P1D"))->format("Y-m-d\TH:i:s\Z"),
+                    ->add(new \DateInterval("PT900S"))->format("Y-m-d\TH:i:s\Z"),
         ];
     }
 }
