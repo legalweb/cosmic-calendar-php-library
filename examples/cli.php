@@ -12,10 +12,12 @@ namespace {
     use GetOpt\ArgumentException\Missing;
     use Legalweb\CosmicCalendarClientExample\Lib\Commands\AddEvent;
     use Legalweb\CosmicCalendarClientExample\Lib\Commands\AddTask;
+    use Legalweb\CosmicCalendarClientExample\Lib\Commands\GetCalendlyLink;
     use Legalweb\CosmicCalendarClientExample\Lib\Commands\GetClientToken;
     use Legalweb\CosmicCalendarClientExample\Lib\Commands\GetEvents;
     use Legalweb\CosmicCalendarClientExample\Lib\Commands\GetTasks;
     use Legalweb\CosmicCalendarClientExample\Lib\Commands\GetOAuthURLs;
+    use Legalweb\CosmicCalendarClientExample\Lib\Commands\SetCalendlyLink;
 
     define('NAME', 'run');
     define('VERSION', '1.0-alpha');
@@ -40,6 +42,8 @@ namespace {
     $opt->addCommand(new GetEvents());
     $opt->addCommand(new GetTasks());
     $opt->addCommand(new GetOAuthURLs());
+    $opt->addCommand(new GetCalendlyLink());
+    $opt->addCommand(new SetCalendlyLink());
 
     try {
         try {

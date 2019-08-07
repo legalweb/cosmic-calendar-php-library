@@ -18,6 +18,7 @@ use Legalweb\CosmicCalendarClient\Exceptions\TokenNotFoundException;
 use Legalweb\CosmicCalendarClient\Exceptions\URLsNotFoundException;
 use Legalweb\CosmicCalendarClient\Exceptions\UserNotConfiguredException;
 use Legalweb\CosmicCalendarClient\Models\EventRequest;
+use Legalweb\CosmicCalendarClient\Models\SetCalendlyLinkRequest;
 use Legalweb\CosmicCalendarClient\Models\TaskRequest;
 
 /**
@@ -129,12 +130,78 @@ class CalendarService
     }
 
     /**
+     * @return |null
+     * @throws APIRequestException
+     * @throws APIUnavailableException
+     * @throws AccessForbiddenException
+     * @throws ClientTokenDecodingException
+     * @throws InvalidJSONResponseException
+     * @throws UserNotConfiguredException
+     */
+    public function GetCalendlyLink() {
+        $this->mustHaveUser();
+
+        $url = "/calendly/link";
+
+        $r = $this->curlRequest($url);
+
+        if ($r === null) {
+            return null;
+        }
+
+        if (!isset($r->Url)) {
+            throw new CalendlyUrlNotSetException("Calendly link not set");
+        }
+
+        return $r->Url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return |null
+     * @throws APIRequestException
+     * @throws APIUnavailableException
+     * @throws AccessForbiddenException
+     * @throws ClientTokenDecodingException
+     * @throws InvalidJSONResponseException
+     * @throws UserNotConfiguredException
+     */
+    public function SetCalendlyLink(string $url) {
+        $this->mustHaveUser();
+
+        $setRequest = new SetCalendlyLinkRequest($url);
+
+        $data = json_encode($setRequest);
+
+        $url = "/calendly/link";
+
+        $r = $this->curlRequest($url, $data);
+
+        if ($r === null) {
+            return null;
+        }
+
+        if (!isset($r->Url)) {
+            throw new CalendlyUrlNotSetException("Calendly link not set");
+        }
+
+        return $r->Url;
+    }
+
+    /**
      * @param string         $summary
      * @param \DateTime      $start
      * @param \DateTime|null $end
      *
      * @return |null
+     * @throws APIRequestException
+     * @throws APIUnavailableException
+     * @throws AccessForbiddenException
+     * @throws ClientTokenDecodingException
      * @throws EventNotCreatedException
+     * @throws InvalidJSONResponseException
+     * @throws UserNotConfiguredException
      */
     public function AddEvent(string $summary, \DateTime $start, \DateTime $end = null) {
         $this->mustHaveUser();
@@ -163,7 +230,13 @@ class CalendarService
      * @param \DateTime $due
      *
      * @return |null
+     * @throws APIRequestException
+     * @throws APIUnavailableException
+     * @throws AccessForbiddenException
+     * @throws ClientTokenDecodingException
+     * @throws InvalidJSONResponseException
      * @throws TaskNotCreatedException
+     * @throws UserNotConfiguredException
      */
     public function AddTask(string $title, \DateTime $due) {
         $this->mustHaveUser();
@@ -191,8 +264,13 @@ class CalendarService
      * @param int $days
      *
      * @return |null
+     * @throws APIRequestException
+     * @throws APIUnavailableException
+     * @throws AccessForbiddenException
+     * @throws ClientTokenDecodingException
      * @throws EventItemsNotFoundException
      * @throws EventsNotFoundException
+     * @throws InvalidJSONResponseException
      * @throws UserNotConfiguredException
      */
     public function GetEvents(int $days = 0) {
@@ -223,6 +301,11 @@ class CalendarService
 
     /**
      * @return |null
+     * @throws APIRequestException
+     * @throws APIUnavailableException
+     * @throws AccessForbiddenException
+     * @throws ClientTokenDecodingException
+     * @throws InvalidJSONResponseException
      * @throws TaskItemsNotFoundException
      * @throws TasksNotFoundException
      * @throws UserNotConfiguredException
@@ -249,6 +332,11 @@ class CalendarService
 
     /**
      * @return |null
+     * @throws APIRequestException
+     * @throws APIUnavailableException
+     * @throws AccessForbiddenException
+     * @throws ClientTokenDecodingException
+     * @throws InvalidJSONResponseException
      * @throws URLsNotFoundException
      */
     public function GetOAuthURLs() {
