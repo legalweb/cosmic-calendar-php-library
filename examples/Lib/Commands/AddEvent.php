@@ -6,6 +6,7 @@ use GetOpt\Command;
 use GetOpt\GetOpt;
 use GetOpt\Option;
 use Legalweb\CosmicCalendarClient\CalendarService;
+use Legalweb\CosmicCalendarClient\Models\EventReminder;
 use Legalweb\CosmicCalendarClient\Traits\Castable;
 use Legalweb\CosmicCalendarClientExample\Lib\Traits\Configurable;
 
@@ -21,6 +22,8 @@ class AddEvent extends Command {
             Option::create("t", "title", Getopt::REQUIRED_ARGUMENT)->setDescription("Specify title of event"),
             Option::create(null, "start", Getopt::REQUIRED_ARGUMENT)->setDescription("Specify start date time of event"),
             Option::create(null, "end", Getopt::OPTIONAL_ARGUMENT)->setDescription("Specify end date time of event"),
+            Option::create(null, 'email-reminder', Getopt::OPTIONAL_ARGUMENT)->setDescription("Minutes before event to send email reminder"),
+            Option::create(null, 'popup-reminder', Getopt::OPTIONAL_ARGUMENT)->setDescription("Minutes before event to popup reminder"),
         ];
         parent::__construct('addevent', [$this, 'handle'], $options);
     }
@@ -48,7 +51,19 @@ class AddEvent extends Command {
                 $end = new \DateTime($opt->getOption("end"));
             }
 
-            $r = $cs->AddEvent($summary, $start, $end);
+            $reminders = [];
+
+            if ($emailReminder = $opt->getOption("email-reminder")) {
+                $emailReminder = new EventReminder("email", $emailReminder);
+                $reminders[] = $emailReminder;
+            }
+
+            if ($popupReminder = $opt->getOption("popup-reminder")) {
+                $popupReminder = new EventReminder("popup", $popupReminder);
+                $reminders[] = $popupReminder;
+            }
+
+            $r = $cs->AddEvent($summary, $start, $end, ...$reminders);
 
             if ($r) {
                 var_dump($r);

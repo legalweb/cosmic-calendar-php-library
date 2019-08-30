@@ -17,6 +17,7 @@ use Legalweb\CosmicCalendarClient\Exceptions\TasksNotFoundException;
 use Legalweb\CosmicCalendarClient\Exceptions\TokenNotFoundException;
 use Legalweb\CosmicCalendarClient\Exceptions\URLsNotFoundException;
 use Legalweb\CosmicCalendarClient\Exceptions\UserNotConfiguredException;
+use Legalweb\CosmicCalendarClient\Models\EventReminder;
 use Legalweb\CosmicCalendarClient\Models\EventRequest;
 use Legalweb\CosmicCalendarClient\Models\SetCalendlyLinkRequest;
 use Legalweb\CosmicCalendarClient\Models\TaskRequest;
@@ -203,10 +204,10 @@ class CalendarService
      * @throws InvalidJSONResponseException
      * @throws UserNotConfiguredException
      */
-    public function AddEvent(string $summary, \DateTime $start, \DateTime $end = null) {
+    public function AddEvent(string $summary, \DateTime $start, \DateTime $end = null, EventReminder ...$reminders) {
         $this->mustHaveUser();
 
-        $eventRequest = new EventRequest($summary, $start, $end);
+        $eventRequest = new EventRequest($summary, $start, $end, ...$reminders);
 
         $data = json_encode($eventRequest);
 
@@ -436,7 +437,7 @@ class CalendarService
             curl_setopt($ch,CURLOPT_SSL_VERIFYSTATUS, false);
         }
 
-        curl_setopt($ch, CURLOPT_VERBOSE, true);
+        //curl_setopt($ch, CURLOPT_VERBOSE, true);
 
         $r = curl_exec($ch);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
