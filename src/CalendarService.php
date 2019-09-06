@@ -192,6 +192,7 @@ class CalendarService
 
     /**
      * @param string         $summary
+     * @param string         $description
      * @param \DateTime      $start
      * @param \DateTime|null $end
      *
@@ -204,10 +205,10 @@ class CalendarService
      * @throws InvalidJSONResponseException
      * @throws UserNotConfiguredException
      */
-    public function AddEvent(string $summary, \DateTime $start, \DateTime $end = null, EventReminder ...$reminders) {
+    public function AddEvent(string $summary, string $description, \DateTime $start, \DateTime $end = null, EventReminder ...$reminders) {
         $this->mustHaveUser();
 
-        $eventRequest = new EventRequest($summary, $start, $end, ...$reminders);
+        $eventRequest = new EventRequest($summary, $description, $start, $end, ...$reminders);
 
         $data = json_encode($eventRequest);
 

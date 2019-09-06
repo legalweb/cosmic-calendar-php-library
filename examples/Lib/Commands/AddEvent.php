@@ -20,6 +20,7 @@ class AddEvent extends Command {
         $options = [
             Option::create("u", "user", Getopt::REQUIRED_ARGUMENT)->setDescription("Specify user to act on behalf of"),
             Option::create("t", "title", Getopt::REQUIRED_ARGUMENT)->setDescription("Specify title of event"),
+            Option::create("d", "details", Getopt::REQUIRED_ARGUMENT)->setDescription("Specify details of event"),
             Option::create(null, "start", Getopt::REQUIRED_ARGUMENT)->setDescription("Specify start date time of event"),
             Option::create(null, "end", Getopt::OPTIONAL_ARGUMENT)->setDescription("Specify end date time of event"),
             Option::create(null, 'email-reminder', Getopt::OPTIONAL_ARGUMENT)->setDescription("Minutes before event to send email reminder"),
@@ -44,6 +45,7 @@ class AddEvent extends Command {
             $cs = CalendarService::NewCalendarService($c, false, $opt->getOption("user"));
 
             $summary = $opt->getOption("title");
+            $description = $opt->getOption("details");
             $start = new \DateTime($opt->getOption("start"));
             $end = null;
 
@@ -63,7 +65,7 @@ class AddEvent extends Command {
                 $reminders[] = $popupReminder;
             }
 
-            $r = $cs->AddEvent($summary, $start, $end, ...$reminders);
+            $r = $cs->AddEvent($summary, $description, $start, $end, ...$reminders);
 
             if ($r) {
                 var_dump($r);
